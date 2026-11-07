@@ -1,0 +1,68 @@
+name: AgentProof PR Evaluation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: agentproof-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  evaluate-agent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      AGENT_ENDPOINT: ${{ secrets.AGENTPROOF_AGENT_ENDPOINT }}
+      ALLOW_REMOTE_AGENTS: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+      - name: Evaluate AI Research Assistant
+        id: agentproof
+        continue-on-error: true
+        run: npm run report:pr
+
+      - name: Upload evaluation evidence
+        if: always() && hashFiles('artifacts/agentproof-report.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: agentproof-report-${{ github.run_id }}
+          path: artifacts/
+          retention-days: 30
+
+      - name: Create or update PR report
+        if: always() && github.event_name == 'pull_request' && hashFiles('artifacts/agentproof-report.md') != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- agentproof-pr-report -->';
+            const body = fs.readFileSync('artifacts/agentproof-report.md', 'utf8');
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const previous = comments.find(comment => comment.user.type === 'Bot' && comment.body?.includes(marker));
+            if (previous) {
+              await github.rest.issues.updateComment({ owner: context.repo.owner, repo: context.repo.repo, comment_id: previous.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body });
+            }
+
+      - name: Enforce AgentProof gate
+        if: steps.agentproof.outcome == 'failure'
+        run: exit 1

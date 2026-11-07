@@ -1,0 +1,40 @@
+{
+  "name": "agentproof",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n api,web -c yellow,cyan \"tsx watch server/index.ts\" \"vite\"",
+    "build": "tsc -b && vite build",
+    "test": "vitest run",
+    "evaluate": "node --import tsx scripts/evaluate.ts",
+    "report:pr": "node --import tsx scripts/pr-report.ts",
+    "start": "tsx server/index.ts"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.10.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.301.0",
+    "@opentelemetry/sdk-trace": "^3.1.0",
+    "@types/pg": "^8.23.1",
+    "@vitejs/plugin-react": "latest",
+    "cors": "latest",
+    "express": "latest",
+    "lucide-react": "latest",
+    "pg": "^8.23.1",
+    "react": "latest",
+    "react-dom": "latest",
+    "recharts": "latest"
+  },
+  "devDependencies": {
+    "@types/cors": "latest",
+    "@types/express": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "concurrently": "latest",
+    "tsx": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "vitest": "latest"
+  }
+}

@@ -1,0 +1,24 @@
+name: AgentProof CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  quality-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Start evaluation server
+        run: npm start &
+      - name: Wait for server
+        run: for i in {1..20}; do curl -sf http://localhost:8787/api/health && exit 0; sleep 1; done; exit 1
+      - name: Agent regression gate
+        run: npm run evaluate -- http://localhost:8787/api/demo-agent

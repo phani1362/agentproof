@@ -1,0 +1,9 @@
+node_modules
+dist
+.DS_Store
+coverage
+*.log
+data/runs.json
+data/scenarios.json
+existing-agent/
+artifacts/
