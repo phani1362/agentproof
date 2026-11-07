@@ -22,3 +22,21 @@
 .action-link svg{width:13px}
 .copy-gate{margin:0 22px 22px}
 @media(max-width:1150px){.settings-grid{grid-template-columns:1fr}}
+.metric-guide{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);background:#0d100d;margin-bottom:16px}
+.metric-guide>div{padding:13px 15px;border-right:1px solid var(--line)}
+.metric-guide>div:last-child{border:0}
+.metric-guide b,.metric-guide span{display:block}
+.metric-guide b{font:8px DM Mono;letter-spacing:.08em;color:var(--acid)}
+.metric-guide span{font-size:9px;line-height:1.5;color:var(--muted);margin-top:6px}
+.run-columns{display:grid;grid-template-columns:15px 110px 1fr 70px 80px 20px;gap:15px;padding:9px 18px;border-bottom:1px solid var(--line);font:7px DM Mono;letter-spacing:.1em;color:#697361}
+.run-agent{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.run-agent em{font:7px DM Mono;font-style:normal;padding:4px 6px;border:1px solid #3c472f;color:var(--acid);white-space:nowrap}
+.demo-run{opacity:.72}
+.demo-run .run-agent em{border-color:#3b3f38;color:#8e9787}
+.run-table button>b small{font-size:7px;color:var(--muted)}
+.check-grid{grid-template-columns:repeat(4,1fr)!important}
+.check-grid span small{display:block;font:7px DM Mono;color:var(--muted);margin-top:5px;text-transform:none}
+.empty-results b,.empty-results span{display:block}
+.empty-results b{color:#ffcf70;margin-bottom:8px}
+.empty-results span{max-width:420px;margin:auto;line-height:1.7}
+@media(max-width:1200px){.metric-guide{grid-template-columns:1fr 1fr}.metric-guide>div:nth-child(2){border-right:0}.metric-guide>div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
