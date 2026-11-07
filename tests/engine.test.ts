@@ -35,8 +35,9 @@ describe('baseline comparison', () => {
 });
 
 describe('agent adapters', () => {
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
   it('blocks remote endpoints unless explicitly enabled', () => {
+    vi.stubEnv('ALLOW_REMOTE_AGENTS', 'false');
     expect(() => new HttpAgentAdapter('https://example.com/agent')).toThrow('Remote agent endpoints are disabled');
   });
 
