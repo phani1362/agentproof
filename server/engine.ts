@@ -12,7 +12,7 @@ export type Run = {
 
 export type ScenarioResult = {
   scenarioId: string; name: string; passed: boolean; score: number; latencyMs: number;
-  output?: string; checks: { content: boolean; safety: boolean; citation: boolean; tool: boolean };
+  input?: string; output?: string; checks: { content: boolean; safety: boolean; citation: boolean; tool: boolean };
   error?: string;
 };
 

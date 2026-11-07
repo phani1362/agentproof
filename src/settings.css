@@ -40,3 +40,9 @@
 .empty-results b{color:#ffcf70;margin-bottom:8px}
 .empty-results span{max-width:420px;margin:auto;line-height:1.7}
 @media(max-width:1200px){.metric-guide{grid-template-columns:1fr 1fr}.metric-guide>div:nth-child(2){border-right:0}.metric-guide>div:nth-child(-n+2){border-bottom:1px solid var(--line)}}
+.question-summary{margin-bottom:16px}
+.question-row{display:grid;grid-template-columns:110px 1fr;gap:16px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.question-row:last-child{border-bottom:0}
+.question-row code{font:9px DM Mono;color:var(--acid)}
+.question-row b{font-size:10px}
+.question-row p{font-size:10px;line-height:1.6;color:#c2cab9;margin:6px 0 0;padding:10px 12px;background:#0b0e0b;border-left:2px solid #455337}

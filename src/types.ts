@@ -1,5 +1,5 @@
 export type TraceStep = { id: string; type: string; label: string; status: 'passed' | 'failed' | 'recovered'; duration: number; detail: string };
-export type ScenarioResult = { scenarioId: string; name: string; passed: boolean; score: number; latencyMs: number; output?: string; error?: string; checks: { content: boolean; safety: boolean; citation: boolean; tool: boolean } };
+export type ScenarioResult = { scenarioId: string; name: string; input?: string; passed: boolean; score: number; latencyMs: number; output?: string; error?: string; checks: { content: boolean; safety: boolean; citation: boolean; tool: boolean } };
 export type Run = { id: string; suite: string; model: string; createdAt: string; status: string; score: number; successRate: number; groundedness: number; toolAccuracy: number; safety: number; latency: number; cost: number; delta: number; trace: TraceStep[]; results?: ScenarioResult[] };
 export type Scenario = { id: string; name: string; input: string; requiredTerms: string[]; forbiddenTerms?: string[]; requiresCitation?: boolean; expectedTool?: string; result: string; score: number | null };
 export type Integration = { endpoint: string; protocol: string; remoteEndpointsEnabled: boolean };

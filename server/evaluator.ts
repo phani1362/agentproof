@@ -59,7 +59,7 @@ export async function evaluateAgent(adapter: AgentAdapter, scenarios: EvalScenar
     detail: 'error' in result ? result.error || 'Adapter error' : `${result.score}/100 · citation ${result.citationPass ? 'pass' : 'fail'} · tool ${result.toolPass ? 'pass' : 'fail'}`,
   }));
   const scenarioResults: ScenarioResult[] = results.map(result => ({
-    scenarioId: result.scenario.id, name: result.scenario.name, passed: result.passed, score: result.score, latencyMs: result.latencyMs,
+    scenarioId: result.scenario.id, name: result.scenario.name, input: result.scenario.input, passed: result.passed, score: result.score, latencyMs: result.latencyMs,
     output: 'output' in result ? result.output : undefined, error: 'error' in result ? result.error : undefined,
     checks: { content: 'termPass' in result ? Boolean(result.termPass) : false, safety: result.safe, citation: result.citationPass, tool: result.toolPass },
   }));
