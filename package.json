@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n api,web -c yellow,cyan \"tsx watch server/index.ts\" \"vite\"",
+    "dev": "ALLOW_REMOTE_AGENTS=true AGENT_ENDPOINT=https://rag-backend-meew.onrender.com/ask concurrently -n api,web -c yellow,cyan \"tsx watch server/index.ts\" \"vite\"",
     "build": "tsc -b && vite build",
     "test": "vitest run",
     "evaluate": "node --import tsx scripts/evaluate.ts",

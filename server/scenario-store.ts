@@ -2,7 +2,9 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { evalScenarios, type EvalScenario } from './evaluator.js';
 
-const scenarioPath = join(process.cwd(), 'data', 'scenarios.json');
+const scenarioPath = process.env.VERCEL
+  ? join('/tmp', 'agentproof', 'scenarios.json')
+  : join(process.cwd(), 'data', 'scenarios.json');
 
 function validate(value: unknown): EvalScenario {
   const item = value as Partial<EvalScenario>;

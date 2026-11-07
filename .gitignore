@@ -7,3 +7,4 @@ data/runs.json
 data/scenarios.json
 existing-agent/
 artifacts/
+.vercel

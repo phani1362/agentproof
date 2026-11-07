@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createRun } from '../server/engine';
-import { DocumentAssistantAdapter, HttpAgentAdapter } from '../server/adapters';
+import { detectAgentEndpoint, DocumentAssistantAdapter, HttpAgentAdapter } from '../server/adapters';
 import { evaluateAgent } from '../server/evaluator';
 import { compareRuns } from '../server/comparison';
 
@@ -65,5 +65,23 @@ describe('agent adapters', () => {
     expect(response.citations).toEqual(['https://arxiv.org/abs/1234.5678']);
     expect(response.toolCalls).toContain('retriever');
     expect(response.metadata?.verifiedSentences).toBe(1);
+  });
+
+  it('automatically detects the research-assistant contract', async () => {
+    const mockedFetch = vi.fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify({ detail: 'invalid body' }), { status: 422, headers: { 'content-type': 'application/json' } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ answer: 'answer', sources: [], steps: [], blocked: false }), { status: 200, headers: { 'content-type': 'application/json' } }));
+    vi.stubGlobal('fetch', mockedFetch);
+    const detected = await detectAgentEndpoint('http://localhost:8000/ask');
+    expect(detected.adapter).toBe('document-assistant');
+    expect(detected.protocol).toBe('native-fastapi/ask');
+    expect(mockedFetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('automatically detects the generic AgentProof contract', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ output: 'ready', citations: [] }), { status: 200, headers: { 'content-type': 'application/json' } })));
+    const detected = await detectAgentEndpoint('http://localhost:8787/agent');
+    expect(detected.adapter).toBe('generic');
+    expect(detected.evidence).toContain('output:string');
   });
 });

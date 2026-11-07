@@ -4,7 +4,9 @@ import pg from 'pg';
 import type { Run } from './engine.js';
 
 const { Pool } = pg;
-const storePath = join(process.cwd(), 'data', 'runs.json');
+const storePath = process.env.VERCEL
+  ? join('/tmp', 'agentproof', 'runs.json')
+  : join(process.cwd(), 'data', 'runs.json');
 
 export interface RunRepository {
   backend: 'json' | 'postgres';

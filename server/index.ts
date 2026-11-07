@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { createRun, initialRuns, type Run } from './engine.js';
 import { evaluateDocumentAssistant, evaluateEndpoint } from './evaluator.js';
-import { getDefaultEndpoint } from './adapters.js';
+import { detectAgentEndpoint, getDefaultEndpoint } from './adapters.js';
 import { createRunRepository } from './store.js';
 import { ScenarioStore } from './scenario-store.js';
 import { telemetryStatus } from './telemetry.js';
@@ -36,13 +36,20 @@ app.post('/api/scenarios', async (req, res) => {
 });
 app.get('/api/integration', (_req, res) => res.json({ endpoint: getDefaultEndpoint(), protocol: 'agentproof-http/1.0', remoteEndpointsEnabled: process.env.ALLOW_REMOTE_AGENTS === 'true' }));
 app.get('/api/profiles', (_req, res) => res.json([{ id: 'generic', name: 'Generic Agent', scenarios: (profileScenarios() || []).length }, { id: 'document-assistant', name: 'AI Research Assistant', scenarios: documentAssistantScenarios.length, localEndpoint: 'http://localhost:8000/ask' }]));
+app.post('/api/detect-endpoint', async (req, res) => {
+  try { res.json(await detectAgentEndpoint(String(req.body?.endpoint || ''))); }
+  catch (error) { res.status(400).json({ error: error instanceof Error ? error.message : 'Endpoint detection failed' }); }
+});
 app.post('/api/runs', async (req, res) => {
   try {
-    const scenarios = profileScenarios(req.body?.profile) || await scenarioStore.list();
+    const endpoint = req.body.endpoint || getDefaultEndpoint();
+    const detected = req.body?.mode === 'http' && (!req.body?.adapter || req.body.adapter === 'auto') ? await detectAgentEndpoint(endpoint) : null;
+    const adapter = detected?.adapter || req.body?.adapter || 'generic';
+    const scenarios = profileScenarios(adapter) || await scenarioStore.list();
     const run = req.body?.mode === 'http'
-      ? req.body?.adapter === 'document-assistant'
-        ? await evaluateDocumentAssistant(req.body.endpoint || 'http://localhost:8000/ask', scenarios)
-        : await evaluateEndpoint(req.body.endpoint || getDefaultEndpoint(), scenarios)
+      ? adapter === 'document-assistant'
+        ? await evaluateDocumentAssistant(endpoint, scenarios)
+        : await evaluateEndpoint(endpoint, scenarios)
       : createRun(req.body || {});
     runs.unshift(run);
     await store.save(run);
@@ -81,4 +88,8 @@ app.post('/api/demo-document-assistant', (req, res) => {
   });
 });
 
-app.listen(8787, () => console.log('AgentProof API listening on http://localhost:8787'));
+if (!process.env.VERCEL) {
+  app.listen(8787, () => console.log('AgentProof API listening on http://localhost:8787'));
+}
+
+export default app;
